@@ -1,6 +1,9 @@
 # Cortex Gateway
 
-![License](https://img.shields.io/github/license/weeco/cortex-gateway.svg?color=blue) [![Go Report Card](https://goreportcard.com/badge/github.com/weeco/cortex-gateway)](https://goreportcard.com/report/github.com/weeco/cortex-gateway) ![GitHub release](https://img.shields.io/github/release/weeco/cortex-gateway.svg) [![Docker Repository on Quay](https://quay.io/repository/weeco/cortex-gateway/status "Docker Repository on Quay")](https://quay.io/repository/weeco/cortex-gateway)
+![License](https://img.shields.io/github/license/weeco/cortex-gateway.svg?color=blue)
+[![Go Report Card](https://goreportcard.com/badge/github.com/weeco/cortex-gateway)](https://goreportcard.com/report/github.com/weeco/cortex-gateway)
+![GitHub release](https://img.shields.io/github/release/weeco/cortex-gateway.svg)
+[![Docker Repository on Quay](https://quay.io/repository/weeco/cortex-gateway/status "Docker Repository on Quay")](https://quay.io/repository/weeco/cortex-gateway)
 
 Cortex Gateway is a microservice which strives to help you administrating and operating your [Cortex](https://github.com/cortexproject/cortex) Cluster in multi tenant environments.
 
