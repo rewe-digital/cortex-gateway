@@ -31,7 +31,6 @@ var (
 
 func init() {
 	flag.StringVar(&jwtSecret, "gateway.auth.jwt-secret", "", "Secret to sign JSON Web Tokens")
-	prometheus.MustRegister(authFailures)
 }
 
 // AuthenticateTenant validates the Bearer Token and attaches the TenantID to the request
@@ -67,7 +66,7 @@ var AuthenticateTenant = middleware.Func(func(next http.Handler) http.Handler {
 		// to additionally check the parsed token for "Valid"
 		if err != nil {
 			http.Error(w, "Invalid bearer token", http.StatusUnauthorized)
-			authFailures.WithLabelValues("token_not_valid", te.TenantID)
+			authFailures.WithLabelValues("token_not_valid", te.TenantID).Inc()
 			return
 		}
 
