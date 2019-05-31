@@ -3,6 +3,9 @@ package gateway
 import (
 	"net/http"
 
+	"github.com/cortexproject/cortex/pkg/util"
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/weaveworks/common/server"
 )
 
@@ -44,5 +47,11 @@ func (g *Gateway) registerRoutes() {
 	g.server.HTTP.Path("/ring").HandlerFunc(g.distributorProxy.Handler)
 	g.server.HTTP.Path("/all_user_stats").HandlerFunc(g.distributorProxy.Handler)
 	g.server.HTTP.Path("/api/prom/push").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.distributorProxy.Handler)))
-	g.server.HTTP.PathPrefix("api/prom/").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.queryFrontendProxy.Handler)))
+	g.server.HTTP.PathPrefix("/api/prom").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.queryFrontendProxy.Handler)))
+	g.server.HTTP.Path("/").HandlerFunc(g.defaultHandler)
+}
+
+func (g *Gateway) defaultHandler(res http.ResponseWriter, req *http.Request) {
+	logger := log.With(util.WithContext(req.Context(), util.Logger), "ip_address", getIPAdress(req))
+	level.Info(logger).Log("msg", "no request handler defined for this route", "route", req.RequestURI)
 }
