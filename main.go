@@ -23,7 +23,7 @@ func main() {
 
 	var (
 		serverCfg = server.Config{
-			MetricsNamespace: "cortex",
+			MetricsNamespace: "cortex_gateway",
 			HTTPMiddleware: []middleware.Interface{
 				middleware.Func(func(handler http.Handler) http.Handler {
 					return nethttp.Middleware(opentracing.GlobalTracer(), handler, operationNameFunc)

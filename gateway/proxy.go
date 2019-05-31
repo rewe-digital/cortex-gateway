@@ -4,6 +4,9 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 // Proxy pipes the traffic between the requester (Prometheus / Grafana) and upstream service
@@ -13,6 +16,14 @@ type Proxy struct {
 
 	reverseProxy *httputil.ReverseProxy
 }
+
+var (
+	proxyCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "cortex_gateway",
+		Name:      "proxy_requests_total",
+		Help:      "The total number of proxy requests.",
+	}, []string{"targetname"})
+)
 
 // newProxy creates a new reverse proxy for a single upstream service
 func newProxy(target string, targetName string) (*Proxy, error) {
@@ -32,6 +43,8 @@ func newProxy(target string, targetName string) (*Proxy, error) {
 
 // Handler is the route handler which must be bound to the routes
 func (p *Proxy) Handler(res http.ResponseWriter, req *http.Request) {
+	proxyCounter.WithLabelValues(p.targetName).Inc()
+
 	// This launches a new Go routine under the hood and therefore it's non blocking
 	p.reverseProxy.ServeHTTP(res, req)
 }
