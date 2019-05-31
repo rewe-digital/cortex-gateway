@@ -44,5 +44,5 @@ func (g *Gateway) registerRoutes() {
 	g.server.HTTP.Path("/ring").HandlerFunc(g.distributorProxy.Handler)
 	g.server.HTTP.Path("/all_user_stats").HandlerFunc(g.distributorProxy.Handler)
 	g.server.HTTP.Path("/api/prom/push").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.distributorProxy.Handler)))
-	g.server.HTTP.PathPrefix("api/prom/").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.queryFrontendProxy.Handler)))
+	g.server.HTTP.PathPrefix("/api/prom/").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.queryFrontendProxy.Handler)))
 }
