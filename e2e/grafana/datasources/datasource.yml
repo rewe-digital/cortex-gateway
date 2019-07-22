@@ -1,6 +1,6 @@
 apiVersion: 1
 datasources:
-- name: Docker Hosdt
+- name: Docker Host
   access: proxy
   orgId: 0
   isDefault: false
