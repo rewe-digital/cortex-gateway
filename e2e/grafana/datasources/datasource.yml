@@ -1,0 +1,13 @@
+apiVersion: 1
+datasources:
+- name: Docker Hosdt
+  access: proxy
+  orgId: 0
+  isDefault: false
+  jsonData: 
+    httpHeaderName1: "Authorization"
+  secureJsonData: 
+    httpHeaderValue1: "Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOiJkZXZlbG9wbWVudCIsInZlcnNpb24iOjEsImF1ZCI6InJld2UifQ.a7zdFoVYTk_CKR1Cj3h6S3SBGPseS0x3PNJjy4jdvPtWaraDC638QlXu0CeBMf3vLWPBJB0fopbSMQvm6IoPtw"
+  type: "prometheus"
+  url: "http://host.docker.internal/api/prom/push"
+  version: 1
