@@ -29,3 +29,13 @@ We try to solve this problem by adding a Gateway which can be considered the ent
 | `-gateway.distributor.address` | Upstream HTTP URL for Cortex Distributor | (empty string) |
 | `-gateway.query-frontend.address` | Upstream HTTP URL for Cortex Query Frontend | (empty string) |
 | `-gateway.auth.jwt-secret` | HMAC secret to sign JSON Web Tokens | (empty string) |
+
+### Expected JWT payload
+
+The expected Bearer token payload can be found here: https://github.com/weeco/cortex-gateway/blob/master/gateway/tenant.go#L7-L11
+
+- "tenant_id"
+- "aud"
+- "version"
+
+The audience and version claim is currently unused, but might be used in the future (e. g. to invalidate tokens).
