@@ -6,7 +6,7 @@ RUN apk update && apk add --no-cache git ca-certificates && update-ca-certificat
 WORKDIR /app
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -installsuffix cgo -o /go/bin/cortex-gateway
+RUN CGO_ENABLED=0 go build -o /go/bin/cortex-gateway
 
 # executable image
 FROM alpine:3
