@@ -14,9 +14,19 @@ Cortex Gateway is a microservice which strives to help you administrating and op
 
 #### Authentication Feature
 
-If you run Cortex for multiple tenants you need to identify your tenants every time they send metrics or query them. This is needed to ensure that metrics can be ingested and queried separately from each other. For this purpose the Cortex microservices require you to pass a Header called `X-Scope-OrgID`. Unfortunately the Prometheus Remote write API has no config option to send headers and for Grafana you must provision a datasource to do so. Therefore the suggested Cortex k8s manifests suggest to deploy an NGINX cluster inside of each tenant which acts as reverse proxy and does nothing but proxying the traffic and sets the `X-Scope-OrgID` header for your tenant.
+If you run Cortex for multiple tenants you need to identify your tenants every time they send metrics or query them.
+This is needed to ensure that metrics can be ingested and queried separately from each other.
+For this purpose the Cortex microservices require you to pass a Header called `X-Scope-OrgID`.
+Unfortunately the Prometheus Remote write API has no config option to send headers and for Grafana you must provision
+a datasource to do so. Therefore the Cortex k8s manifests suggest deploying an NGINX server inside of each
+tenant which acts as reverse proxy. It's sole purpose is proxying the traffic and setting the `X-Scope-OrgID` header for
+your tenant.
 
-We try to solve this problem by adding a Gateway which can be considered the entrypoint for all requests towards Cortex (see [Architecture](#architecture)). Prometheus and Grafana both sent a JSON Web Token (JWT) along with each request. This JWT carries a claim which is the tenant's identifier. Once this JWT is validated we'll set the required `X-Scope-OrgID` header and pipe the traffic to the upstream Cortex microservices (distributor / query frontend).
+We try to solve this problem by adding a Gateway which can be considered the entry point for all requests towards
+Cortex (see [Architecture](#architecture)). Prometheus and Grafana can both send a self contained JSON Web Token (JWT)
+along with each request. This JWT carries a claim which is the tenant's identifier.
+Once this JWT is validated we'll set the required `X-Scope-OrgID` header and pipe the traffic to the upstream
+Cortex microservices (distributor / query frontend).
 
 ## Architecture
 
