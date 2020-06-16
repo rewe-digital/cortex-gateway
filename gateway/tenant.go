@@ -10,10 +10,10 @@ type tenant struct {
 	Version  uint8  `json:"version"`
 }
 
-// Valid returns an error in case this tenant had been blacklisted
+// Valid returns an error if JWT payload is incomplete
 func (t *tenant) Valid() error {
 	if t.TenantID == "" {
-		return fmt.Errorf("Tenant is empty")
+		return fmt.Errorf("tenant is empty")
 	}
 
 	return nil
