@@ -2,7 +2,7 @@ version: "3.1"
 
 services:
   prometheus:
-    image: prom/prometheus:v2.10.0
+    image: prom/prometheus:v2.19.0
     volumes:
       - ./prometheus/:/etc/prometheus/
     command:
@@ -13,11 +13,11 @@ services:
     ports:
       - 9090:9090
     restart: always
-  # grafana:
-  #   image: grafana/grafana
-  #   volumes:
-  #     - ./grafana/datasources:/etc/grafana/provisioning/datasources
-  #   user: "104"
-  #   ports:
-  #     - 3000:3000
-  #   restart: always
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    user: "104"
+    ports:
+      - 3000:3000
+    restart: always

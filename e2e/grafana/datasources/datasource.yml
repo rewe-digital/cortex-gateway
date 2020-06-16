@@ -9,5 +9,5 @@ datasources:
   secureJsonData: 
     httpHeaderValue1: "Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOiJkZXZlbG9wbWVudCIsInZlcnNpb24iOjEsImF1ZCI6InJld2UifQ.a7zdFoVYTk_CKR1Cj3h6S3SBGPseS0x3PNJjy4jdvPtWaraDC638QlXu0CeBMf3vLWPBJB0fopbSMQvm6IoPtw"
   type: "prometheus"
-  url: "http://host.docker.internal/api/prom/push"
+  url: "http://host.docker.internal"
   version: 1
