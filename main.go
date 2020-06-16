@@ -41,6 +41,10 @@ func main() {
 
 	util.InitLogger(&serverCfg)
 
+	// Must be done after initializing the logger, otherwise no log message is printed
+	err := gatewayCfg.Validate()
+	util.CheckFatal("validating gateway config", err)
+
 	// Setting the environment variable JAEGER_AGENT_HOST enables tracing
 	trace := tracing.NewFromEnv("cortex-gateway")
 	defer trace.Close()
