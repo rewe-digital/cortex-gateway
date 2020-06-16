@@ -21,7 +21,7 @@ var (
 		Namespace: "cortex_gateway",
 		Name:      "failed_authentications_total",
 		Help:      "The total number of failed authentications.",
-	}, []string{"reason", "tenant"})
+	}, []string{"reason"})
 	authSuccess = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "cortex_gateway",
 		Name:      "succeeded_authentications_total",
@@ -36,14 +36,14 @@ func init() {
 // AuthenticateTenant validates the Bearer Token and attaches the TenantID to the request
 var AuthenticateTenant = middleware.Func(func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger := log.With(util.WithContext(r.Context(), util.Logger), "ip_address", getIPAdress(r))
+		logger := log.With(util.WithContext(r.Context(), util.Logger), "ip_address", r.RemoteAddr)
 		level.Debug(logger).Log("msg", "authenticating request", "route", r.RequestURI)
 
 		tokenString := r.Header.Get("Authorization") // Get operation is case insensitive
 		if tokenString == "" {
 			level.Info(logger).Log("msg", "no bearer token provided")
 			http.Error(w, "No bearer token provided", http.StatusUnauthorized)
-			authFailures.WithLabelValues("no_token", "").Inc()
+			authFailures.WithLabelValues("no_token").Inc()
 			return
 		}
 
@@ -53,7 +53,7 @@ var AuthenticateTenant = middleware.Func(func(next http.Handler) http.Handler {
 			r,
 			jwtReq.AuthorizationHeaderExtractor,
 			func(token *jwt.Token) (interface{}, error) {
-				// Only HMAC algorithm accepted - this is super important!
+				// Only HMAC algorithms accepted - algorithm validation is super important!
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 					level.Info(logger).Log("msg", "unexpected signing method", "used_method", token.Header["alg"])
 					return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -67,7 +67,7 @@ var AuthenticateTenant = middleware.Func(func(next http.Handler) http.Handler {
 		// to additionally check the parsed token for "Valid"
 		if err != nil {
 			http.Error(w, "Invalid bearer token", http.StatusUnauthorized)
-			authFailures.WithLabelValues("token_not_valid", te.TenantID).Inc()
+			authFailures.WithLabelValues("token_not_valid").Inc()
 			return
 		}
 
