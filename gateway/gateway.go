@@ -51,14 +51,14 @@ func (g *Gateway) registerRoutes() {
 	g.server.HTTP.PathPrefix("/").HandlerFunc(g.notFoundHandler)
 }
 
-func (g *Gateway) healthCheck(res http.ResponseWriter, req *http.Request) {
-	res.WriteHeader(200)
-	res.Write([]byte("Ok"))
+func (g *Gateway) healthCheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
+	w.Write([]byte("Ok"))
 }
 
-func (g *Gateway) notFoundHandler(res http.ResponseWriter, req *http.Request) {
-	logger := log.With(util.WithContext(req.Context(), util.Logger), "ip_address", getIPAdress(req))
-	level.Info(logger).Log("msg", "no request handler defined for this route", "route", req.RequestURI)
-	res.WriteHeader(404)
-	res.Write([]byte("404 - Resource not found"))
+func (g *Gateway) notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	logger := log.With(util.WithContext(r.Context(), util.Logger), "ip_address", r.RemoteAddr)
+	level.Info(logger).Log("msg", "no request handler defined for this route", "route", r.RequestURI)
+	w.WriteHeader(404)
+	w.Write([]byte("404 - Resource not found"))
 }
