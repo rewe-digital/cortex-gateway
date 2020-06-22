@@ -4,7 +4,7 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/weeco/cortex-gateway/gateway"
+	"github.com/rewe-digital/cortex-gateway/gateway"
 
 	"github.com/cortexproject/cortex/pkg/util"
 	"github.com/cortexproject/cortex/pkg/util/flagext"
