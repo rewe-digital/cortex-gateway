@@ -1,0 +1,23 @@
+# Security Policy
+
+## Supported Versions
+
+Use this section to tell people about which versions of your project are
+currently being supported with security updates.
+
+| Version | Supported          |
+| ------- | ------------------ |
+| 1.x     | :white_check_mark: |
+| < 1.0   | :x:                |
+
+## Reporting a Vulnerability
+
+As with any complex system, it is certain that bugs will be found, some of them security-relevant. If you find a _security bug_
+please report it privately to the maintainers by sending an email to dev-team-quokka@rewe-digital.com. We will fix the issue as soon as possible and coordinate a release date with you. You will be able to choose if you want public acknowledgement of your effort and if you want to be mentioned by name.
+
+## Public Disclosure Timing
+
+The public disclosure date is agreed between the REWE digital team and the bug submitter. We prefer to fully disclose the bug as soon as possible,
+but only after a mitigation or fix is available. We will ask for delay if the bug or the fix is not yet fully understood or the solution is not tested
+to our standards yet. While there is no fixed timeframe for fix & disclosure, we will try our best to be quick and do not expect to need the usual
+90 days most companies ask or. For a vulnerability with a straightforward mitigation, we expect report date to disclosure date to be on the order of 7 days.
