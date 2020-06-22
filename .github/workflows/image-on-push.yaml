@@ -1,0 +1,25 @@
+name: Build Docker image on push & release
+
+on:
+  push:
+    branches:
+      - master
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Build & Push Docker Image
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.QUAY_ROBOT_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+          registry: quay.io
+          repository: rewedigital/cortex-gateway
+          tag_with_ref: true
+          tag_with_sha: true
