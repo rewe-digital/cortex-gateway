@@ -36,6 +36,6 @@ The expected Bearer token payload can be found here: https://github.com/rewe-dig
 
 - "tenant_id"
 - "aud"
-- "version"
+- "version" (must be an integer)
 
 The audience and version claim is currently unused, but might be used in the future (e. g. to invalidate tokens).
