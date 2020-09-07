@@ -66,6 +66,7 @@ var AuthenticateTenant = middleware.Func(func(next http.Handler) http.Handler {
 		// If Tenant's Valid method returns false an error will be set as well, hence there is no need
 		// to additionally check the parsed token for "Valid"
 		if err != nil {
+			level.Info(logger).Log("msg", "invalid bearer token", "err", err.Error())
 			http.Error(w, "Invalid bearer token", http.StatusUnauthorized)
 			authFailures.WithLabelValues("token_not_valid").Inc()
 			return
