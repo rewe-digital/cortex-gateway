@@ -17,7 +17,7 @@ import (
 
 var (
 	jwtSecret    string
-	authFailures = prometheus.NewCounterVec(prometheus.CounterOpts{
+	authFailures = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "cortex_gateway",
 		Name:      "failed_authentications_total",
 		Help:      "The total number of failed authentications.",
