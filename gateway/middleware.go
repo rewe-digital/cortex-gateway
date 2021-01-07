@@ -1,13 +1,14 @@
 package gateway
 
 import (
+	"crypto/rsa"
+	"encoding/base64"
 	"flag"
-	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/cortexproject/cortex/pkg/util"
 	jwt "github.com/dgrijalva/jwt-go"
-	jwtReq "github.com/dgrijalva/jwt-go/request"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
@@ -17,6 +18,8 @@ import (
 
 var (
 	jwtSecret    string
+	jwtSecretEncoded bool
+	jwtValidationAlgo string
 	authFailures = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "cortex_gateway",
 		Name:      "failed_authentications_total",
@@ -31,10 +34,45 @@ var (
 
 func init() {
 	flag.StringVar(&jwtSecret, "gateway.auth.jwt-secret", "", "Secret to sign JSON Web Tokens")
+	flag.BoolVar(&jwtSecretEncoded, "gateway.auth.jwt-secret-encoded", false, "Whether to base64-decode secret before use")
+	flag.StringVar(&jwtValidationAlgo, "gateway.auth.token-validation.algo", "HMAC", "JWT Validation algorithm: HMAC or RSA")
 }
+
 
 // AuthenticateTenant validates the Bearer Token and attaches the TenantID to the request
 var AuthenticateTenant = middleware.Func(func(next http.Handler) http.Handler {
+
+	// Initialize JWT secret
+	jwtSecretBytes := []byte(jwtSecret)
+	var jwtRsaKey rsa.PublicKey
+	var jwtRsaKeyPtr *rsa.PublicKey
+	var err error
+
+	// Optionally decode JWT secret
+	if jwtSecretEncoded {
+		secretDecoded, err := base64.StdEncoding.DecodeString(jwtSecret)
+		if err != nil {
+			logger := log.With(util.Logger)
+			level.Warn(logger).Log("msg", "base64 secret encoding is " +
+				"enabled, but secret cant decode", "secret_encoding", "base64")
+		} else {
+			jwtSecretBytes = secretDecoded
+		}
+	}
+
+	// Optionally parse RSA key
+	var algoLower = strings.ToLower(jwtValidationAlgo)
+	if algoLower == "rsa" {
+		jwtRsaKeyPtr, err = jwt.ParseRSAPublicKeyFromPEM(jwtSecretBytes)
+		if err != nil {
+			logger := log.With(util.Logger)
+			level.Warn(logger).Log("msg", "can not load rsa key ", "secret_encoding", "pem")
+		} else {
+			jwtRsaKey = *jwtRsaKeyPtr
+		}
+	}
+
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger := log.With(util.WithContext(r.Context(), util.Logger), "ip_address", r.RemoteAddr)
 		level.Debug(logger).Log("msg", "authenticating request", "route", r.RequestURI)
@@ -49,19 +87,12 @@ var AuthenticateTenant = middleware.Func(func(next http.Handler) http.Handler {
 
 		// Try to parse and validate JWT
 		te := &tenant{}
-		_, err := jwtReq.ParseFromRequest(
-			r,
-			jwtReq.AuthorizationHeaderExtractor,
-			func(token *jwt.Token) (interface{}, error) {
-				// Only HMAC algorithms accepted - algorithm validation is super important!
-				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					level.Info(logger).Log("msg", "unexpected signing method", "used_method", token.Header["alg"])
-					return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-				}
 
-				return []byte(jwtSecret), nil
-			},
-			jwtReq.WithClaims(te))
+		if algoLower == "rsa" {
+			err = jwtToTenant(r, te, logger, algoLower, &jwtRsaKey)
+		} else {
+			err = jwtToTenant(r, te, logger, algoLower, jwtSecretBytes)
+		}
 
 		// If Tenant's Valid method returns false an error will be set as well, hence there is no need
 		// to additionally check the parsed token for "Valid"
