@@ -33,7 +33,7 @@ func (cfg *Config) Validate() error {
 	}
 
 	if !strings.HasPrefix(cfg.QueryFrontendAddress, "http") {
-		return fmt.Errorf("query frontend address must start with a valid scheme (http/https). Given is '%v'", cfg.DistributorAddress)
+		return fmt.Errorf("query frontend address must start with a valid scheme (http/https). Given is '%v'", cfg.QueryFrontendAddress)
 	}
 
 	return nil
