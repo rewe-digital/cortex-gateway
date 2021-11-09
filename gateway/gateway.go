@@ -38,6 +38,7 @@ func New(cfg Config, svr *server.Server) (*Gateway, error) {
 		cfg:                cfg,
 		distributorProxy:   distributor,
 		queryFrontendProxy: queryFrontend,
+		rulerProxy:         ruler,
 		server:             svr,
 	}, nil
 }
