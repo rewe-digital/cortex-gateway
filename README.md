@@ -1,3 +1,7 @@
+# Archive notice
+
+> **This project is not used internally at REWE-digital anymore and will no longer be maintained.**
+
 # Cortex Gateway
 
 ![License](https://img.shields.io/github/license/rewe-digital/cortex-gateway.svg?color=blue)
