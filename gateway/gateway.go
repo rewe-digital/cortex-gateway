@@ -14,6 +14,7 @@ type Gateway struct {
 	cfg                Config
 	distributorProxy   *Proxy
 	queryFrontendProxy *Proxy
+	rulerProxy         *Proxy
 	server             *server.Server
 }
 
@@ -28,11 +29,16 @@ func New(cfg Config, svr *server.Server) (*Gateway, error) {
 	if err != nil {
 		return nil, err
 	}
+	ruler, err := newProxy(cfg.RulerAddress, "ruler")
+	if err != nil {
+		return nil, err
+	}
 
 	return &Gateway{
 		cfg:                cfg,
 		distributorProxy:   distributor,
 		queryFrontendProxy: queryFrontend,
+		rulerProxy:         ruler,
 		server:             svr,
 	}, nil
 }
@@ -46,6 +52,11 @@ func (g *Gateway) Start() {
 func (g *Gateway) registerRoutes() {
 	g.server.HTTP.Path("/all_user_stats").HandlerFunc(g.distributorProxy.Handler)
 	g.server.HTTP.Path("/api/prom/push").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.distributorProxy.Handler)))
+	g.server.HTTP.PathPrefix("/api/prom/api/v1/alerts").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.rulerProxy.Handler)))
+	g.server.HTTP.PathPrefix("/api/prom/api/v1/rules").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.rulerProxy.Handler)))
+	g.server.HTTP.PathPrefix("/api/v1/alerts").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.rulerProxy.Handler)))
+	g.server.HTTP.PathPrefix("/api/v1/rules").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.rulerProxy.Handler)))
+	g.server.HTTP.PathPrefix("/api/prom/rules").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.rulerProxy.Handler)))
 	g.server.HTTP.PathPrefix("/api").Handler(AuthenticateTenant.Wrap(http.HandlerFunc(g.queryFrontendProxy.Handler)))
 	g.server.HTTP.Path("/health").HandlerFunc(g.healthCheck)
 	g.server.HTTP.PathPrefix("/").HandlerFunc(g.notFoundHandler)
